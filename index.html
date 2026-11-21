@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generator geolovske kode</title>
+  <style>
+    :root {
+      --primary: #2e7d32;
+      --primary-hover: #1b5e20;
+      --bg: #f3f6f4;
+      --card: #ffffff;
+      --text: #1f2933;
+      --muted: #616e7c;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 1rem;
+    }
+
+    .card {
+      background: var(--card);
+      width: 100%;
+      max-width: 420px;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 0.5rem;
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+
+    p.subtitle {
+      margin: 0 0 1.5rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      font-size: 1.05rem;
+      border: 2px solid #d9e2ec;
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary);
+    }
+
+    button {
+      width: 100%;
+      padding: 0.85rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #fff;
+      background-color: var(--primary);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .result-box {
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+      background-color: #e8f5e9;
+      border: 2px dashed #81c784;
+      border-radius: 12px;
+      display: none;
+    }
+
+    .result-label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary);
+      margin-bottom: 0.35rem;
+      font-weight: 600;
+    }
+
+    .code-display {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .user-echo {
+      margin-top: 0.35rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>🌿 Geocaching koda</h1>
+    <p class="subtitle">Vpiši svoje geolovsko uporabniško ime in pridobi svojo osebno trimestno kodo za zaklad.</p>
+
+    <input
+      type="text"
+      id="username"
+      placeholder="Tvoje geolovsko ime..."
+      autocomplete="off"
+      onkeydown="if(event.key === 'Enter') izracunajKodo()"
+    >
+
+    <button onclick="izracunajKodo()">Prikaži kodo</button>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-label">Tvoja osebna koda</div>
+      <div class="code-display" id="codeOutput">---</div>
+      <div class="user-echo" id="userEcho"></div>
+    </div>
+  </div>
+
+  <script>
+    function izracunajKodo() {
+      const inputEl = document.getElementById('username');
+      const rawName = inputEl.value;
+      const cleanName = rawName.trim().toUpperCase();
+
+      if (!cleanName) {
+        alert('Prosim, vpiši svoje geolovsko uporabniško ime.');
+        inputEl.focus();
+        return;
+      }
+
+      // Enaka matematika kot v Excel formuli:
+      // 100 + MOD(SUMPRODUCT(CODE(znak) * (pozicija^2)); 900)
+      let vsota = 0;
+      for (let i = 0; i < cleanName.length; i++) {
+        const pozicija = i + 1;
+        const charCode = cleanName.charCodeAt(i);
+        vsota += charCode * (pozicija * pozicija);
+      }
+
+      const koda = 100 + (vsota % 900);
+
+      document.getElementById('codeOutput').textContent = koda;
+      document.getElementById('userEcho').textContent = 'Geolovec: ' + rawName.trim();
+      document.getElementById('resultBox').style.display = 'block';
+    }
+  </script>
+
+</body>
+</html>
